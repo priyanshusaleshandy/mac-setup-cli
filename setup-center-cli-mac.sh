@@ -1,11 +1,7 @@
-﻿#!/bin/sh
-# ──────────────────────────────────────────────────────────────────────────────
-# BOOTSTRAP LOADER — Direct Browser Copy-Paste & Shell Auto-Fix
-# ──────────────────────────────────────────────────────────────────────────────
+﻿: 'SETUP CENTER CLI LOADER'; eval '
 if [ -z "$BASH_EXEC_STARTED" ]; then
     export BASH_EXEC_STARTED=1
     stty flush 2>/dev/null || true
-
     if [ -f "$0" ] && [ "$0" != "zsh" ] && [ "$0" != "-zsh" ] && [ "$0" != "sh" ] && [ "$0" != "-sh" ]; then
         exec bash "$0" "$@" < /dev/tty
     else
@@ -18,7 +14,7 @@ if [ -z "$BASH_EXEC_STARTED" ]; then
     fi
     exit 0
 fi
-# ──────────────────────────────────────────────────────────────────────────────
+'
 # ==============================================================================
 # SETUP CENTER CLI — macOS / Bash Edition
 # ==============================================================================
