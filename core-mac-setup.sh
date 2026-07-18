@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+﻿# macOS Setup Center CLI Core Engine
 # ==============================================================================
 # SETUP CENTER CLI — macOS / Bash Edition (Core Engine)
 # ==============================================================================
@@ -89,31 +89,33 @@ fix_environment() {
 preflight_dependencies() {
     log_info "Checking base tools (Homebrew, curl, git, etc.)..."
 
-    if ! xcode-select -p &>/dev/null 2>&1; then
-        log_warn "Xcode Command Line Tools missing — installing..."
-        xcode-select --install 2>/dev/null || true
-        log_warn "Please complete the Xcode CLT installation popup, then re-run this script."
-        press_enter
-        exit 0
-    fi
-
-    if ! command -v brew &>/dev/null; then
-        log_warn "Homebrew not found — installing now..."
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        if [[ -f /opt/homebrew/bin/brew ]]; then
-            eval "$(/opt/homebrew/bin/brew shellenv)"
-            echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$HOME/.zprofile"
-            echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$HOME/.bash_profile"
-        fi
-    fi
-
+    # Check / setup Homebrew PATH if installed
     if [[ -f /opt/homebrew/bin/brew ]]; then
         eval "$(/opt/homebrew/bin/brew shellenv)"
     elif [[ -f /usr/local/bin/brew ]]; then
         eval "$(/usr/local/bin/brew shellenv)"
     fi
 
-    log_ok "Base tools ready. Homebrew: $(brew --version | head -1)"
+    # Trigger Xcode CLT if missing (in background)
+    if ! xcode-select -p &>/dev/null 2>&1; then
+        log_warn "Xcode Command Line Tools missing — triggering installer..."
+        xcode-select --install 2>/dev/null || true
+    fi
+
+    # Install Homebrew if missing (Homebrew auto-installs Xcode CLT if needed)
+    if ! command -v brew &>/dev/null; then
+        log_warn "Homebrew not found — installing Homebrew now..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        if [[ -f /opt/homebrew/bin/brew ]]; then
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+            echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$HOME/.zprofile"
+            echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$HOME/.bash_profile"
+        elif [[ -f /usr/local/bin/brew ]]; then
+            eval "$(/usr/local/bin/brew shellenv)"
+        fi
+    fi
+
+    log_ok "Base tools check complete. Homebrew: $(brew --version 2>/dev/null | head -1 || echo 'ready')"
 }
 preflight_dependencies
 
