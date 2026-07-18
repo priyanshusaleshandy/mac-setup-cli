@@ -1,14 +1,24 @@
 ﻿#!/bin/sh
-# ── Universal Auto-Relaunch (Direct Copy-Paste & File Execution Fix) ─────────
-if [ -z "$BASH_VERSION" ]; then
+# ──────────────────────────────────────────────────────────────────────────────
+# BOOTSTRAP LOADER — Direct Browser Copy-Paste & Shell Auto-Fix
+# ──────────────────────────────────────────────────────────────────────────────
+if [ -z "$BASH_EXEC_STARTED" ]; then
+    export BASH_EXEC_STARTED=1
+    stty flush 2>/dev/null || true
+
     if [ -f "$0" ] && [ "$0" != "zsh" ] && [ "$0" != "-zsh" ] && [ "$0" != "sh" ] && [ "$0" != "-sh" ]; then
-        exec bash "$0" "$@"
+        exec bash "$0" "$@" < /dev/tty
     else
-        exec bash -c "$(curl -fsSL https://raw.githubusercontent.com/priyanshusaleshandy/mac-setup-cli/main/setup-center-cli-mac.sh)"
+        TMP_SCRIPT="/tmp/mac-setup-center-cli.sh"
+        curl -fsSL "https://raw.githubusercontent.com/priyanshusaleshandy/mac-setup-cli/main/setup-center-cli-mac.sh" -o "$TMP_SCRIPT" 2>/dev/null
+        if [ -f "$TMP_SCRIPT" ]; then
+            chmod +x "$TMP_SCRIPT"
+            exec bash "$TMP_SCRIPT" "$@" < /dev/tty
+        fi
     fi
     exit 0
 fi
-# ── Ab yahan se Pure Bash environment chal raha hai ──────────────────────────
+# ──────────────────────────────────────────────────────────────────────────────
 # ==============================================================================
 # SETUP CENTER CLI — macOS / Bash Edition
 # ==============================================================================
