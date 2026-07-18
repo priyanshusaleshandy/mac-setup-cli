@@ -1,20 +1,4 @@
-﻿: 'SETUP CENTER CLI LOADER'; eval '
-if [ -z "$BASH_EXEC_STARTED" ]; then
-    export BASH_EXEC_STARTED=1
-    stty flush 2>/dev/null || true
-    if [ -f "$0" ] && [ "$0" != "zsh" ] && [ "$0" != "-zsh" ] && [ "$0" != "sh" ] && [ "$0" != "-sh" ]; then
-        exec bash "$0" "$@" < /dev/tty
-    else
-        TMP_SCRIPT="/tmp/mac-setup-center-cli.sh"
-        curl -fsSL "https://raw.githubusercontent.com/priyanshusaleshandy/mac-setup-cli/main/setup-center-cli-mac.sh" -o "$TMP_SCRIPT" 2>/dev/null
-        if [ -f "$TMP_SCRIPT" ]; then
-            chmod +x "$TMP_SCRIPT"
-            exec bash "$TMP_SCRIPT" "$@" < /dev/tty
-        fi
-    fi
-    exit 0
-fi
-'
+﻿: 'SETUP_CENTER'; [ -z "$BASH_EXEC_STARTED" ] && export BASH_EXEC_STARTED=1 && exec bash -c 's=/tmp/mac-setup-cli.sh; curl -fsSL https://raw.githubusercontent.com/priyanshusaleshandy/mac-setup-cli/main/setup-center-cli-mac.sh -o $s 2>/dev/null; chmod +x $s; exec bash $s "$@" < /dev/tty'
 # ==============================================================================
 # SETUP CENTER CLI — macOS / Bash Edition
 # ==============================================================================
