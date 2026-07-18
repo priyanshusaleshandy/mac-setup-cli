@@ -79,6 +79,42 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 SUDO_KEEPALIVE_PID=$!
 trap 'kill "$SUDO_KEEPALIVE_PID" 2>/dev/null' EXIT
 
+# ── Fix Environment & Prerequisites ───────────────────────────────────────────
+fix_environment() {
+    log_section "FIX ENVIRONMENT & PREREQUISITES"
+    log_info "1. Checking Xcode Command Line Tools..."
+    if ! xcode-select -p &>/dev/null 2>&1; then
+        log_warn "Xcode Command Line Tools missing — installing..."
+        xcode-select --install 2>/dev/null || true
+        log_warn "Please complete the Xcode CLT installation popup window."
+    else
+        log_ok "Xcode Command Line Tools already installed."
+    fi
+
+    log_info "2. Checking Homebrew..."
+    if ! command -v brew &>/dev/null; then
+        log_warn "Homebrew not found — installing Homebrew..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    else
+        log_ok "Homebrew is installed."
+    fi
+
+    log_info "3. Fixing Homebrew PATH..."
+    if [[ -f /opt/homebrew/bin/brew ]]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+        grep -q "homebrew/bin" "$HOME/.zprofile" 2>/dev/null || echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$HOME/.zprofile"
+        grep -q "homebrew/bin" "$HOME/.bash_profile" 2>/dev/null || echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$HOME/.bash_profile"
+    elif [[ -f /usr/local/bin/brew ]]; then
+        eval "$(/usr/local/bin/brew shellenv)"
+    fi
+
+    log_info "4. Updating Homebrew formula cache..."
+    brew update &>/dev/null || true
+
+    log_ok "Environment fixed & ready!"
+    press_enter
+}
+
 # ── Preflight: Homebrew install ───────────────────────────────────────────────
 preflight_dependencies() {
     log_info "Checking base tools (Homebrew, curl, git, etc.)..."
@@ -911,34 +947,34 @@ while true; do
     echo "  ╚══════════════════════════════════════════════════════╝"
     echo -e "${NC}"
 
-    # Show macOS version & Homebrew status in header
     local_brew_ver=$(brew --version 2>/dev/null | head -1 | awk '{print $2}' || echo "not installed")
     local_mac_ver=$(sw_vers -productVersion 2>/dev/null || echo "unknown")
     echo -e "  ${DIM}macOS ${local_mac_ver}  |  Homebrew ${local_brew_ver}  |  $(uname -m)${NC}\n"
 
-    echo -e "  ${BOLD}[1]${NC} Install Packages      — select & install tools"
-    echo -e "  ${BOLD}[2]${NC} Uninstall Packages    — remove installed tools"
-    echo -e "  ${BOLD}[3]${NC} System Status         — check what's installed"
-    echo -e "  ${BOLD}[4]${NC} Update System         — brew update + upgrade"
-    echo -e "  ${BOLD}[5]${NC} Tailscale VPN         — install / connect / diagnose / remove"
-    echo -e "  ${BOLD}[6]${NC} System Config         — hostname & git setup"
-    echo -e "  ${BOLD}[7]${NC} Time Doctor Setup     — check, install, uninstall"
-    echo -e "  ${BOLD}[8]${NC} macOS Settings        — screen timeout, dark mode, Gatekeeper"
-    echo -e "  ${BOLD}[9]${NC} Network / WiFi        — DNS flush, ping, diagnostics"
+    echo -e "  ${BOLD}${GREEN}[1] Fix Environment & Prerequisites${NC} — Auto-fix Homebrew, Xcode CLT, PATH"
+    echo -e "  ${BOLD}${CYAN}[2] Check System Status${NC}            — Check installed tools & services"
+    echo -e "  ${BOLD}${MAGENTA}[3] Main Setup Center (Start Install)${NC} — Install tools & packages"
+    echo -e "\n  ── Additional Features ─────────────────────────────────"
+    echo -e "  ${BOLD}[4]${NC} Uninstall Packages    — Remove installed tools"
+    echo -e "  ${BOLD}[5]${NC} Update System         — Brew update + upgrade"
+    echo -e "  ${BOLD}[6]${NC} Tailscale VPN         — Install / connect / diagnose"
+    echo -e "  ${BOLD}[7]${NC} System Config         — Hostname & git setup"
+    echo -e "  ${BOLD}[8]${NC} Time Doctor Setup     — Install / status"
+    echo -e "  ${BOLD}[9]${NC} macOS Settings & WiFi — Screen timeout, dark mode, DNS"
     echo -e "  ${BOLD}[0]${NC} Exit"
     echo -e "\n  ────────────────────────────────────────────────────────"
 
     read -rp "  Choice: " choice < /dev/tty
     case "$choice" in
-        1) menu_install ;;
-        2) menu_uninstall ;;
-        3) menu_status ;;
-        4) menu_update ;;
-        5) menu_tailscale ;;
-        6) menu_sysconfig ;;
-        7) menu_timedoctor ;;
-        8) menu_macos_settings ;;
-        9) menu_network_diagnose ;;
+        1) fix_environment ;;
+        2) menu_status ;;
+        3) menu_install ;;
+        4) menu_uninstall ;;
+        5) menu_update ;;
+        6) menu_tailscale ;;
+        7) menu_sysconfig ;;
+        8) menu_timedoctor ;;
+        9) menu_macos_settings ;;
         0) echo -e "\n  ${CYAN}Goodbye!${NC}\n"; exit 0 ;;
         *) log_warn "Invalid choice — enter 0-9."; sleep 1 ;;
     esac
