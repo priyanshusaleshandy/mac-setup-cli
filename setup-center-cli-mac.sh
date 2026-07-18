@@ -1,4 +1,8 @@
-#!/usr/bin/env bash
+#!/bin/sh
+# ── Auto-relaunch with bash (zsh/sh/any shell pe chalega) ───────────────────
+# Mac ka default shell zsh hai — yeh trick automatically bash se relaunch karta hai
+[ -z "$BASH_VERSION" ] && exec bash "$0" "$@"
+# ── Ab yahan se bash chal raha hai ──────────────────────────────────────────
 # ==============================================================================
 # SETUP CENTER CLI — macOS / Bash Edition
 # ==============================================================================
