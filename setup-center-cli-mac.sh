@@ -1,8 +1,14 @@
 ﻿#!/bin/sh
-# ── Auto-relaunch with bash (zsh/sh/any shell pe chalega) ───────────────────
-# Mac ka default shell zsh hai — yeh trick automatically bash se relaunch karta hai
-[ -z "$BASH_VERSION" ] && exec bash "$0" "$@"
-# ── Ab yahan se bash chal raha hai ──────────────────────────────────────────
+# ── Universal Auto-Relaunch (Direct Copy-Paste & File Execution Fix) ─────────
+if [ -z "$BASH_VERSION" ]; then
+    if [ -f "$0" ] && [ "$0" != "zsh" ] && [ "$0" != "-zsh" ] && [ "$0" != "sh" ] && [ "$0" != "-sh" ]; then
+        exec bash "$0" "$@"
+    else
+        exec bash -c "$(curl -fsSL https://raw.githubusercontent.com/priyanshusaleshandy/mac-setup-cli/main/setup-center-cli-mac.sh)"
+    fi
+    exit 0
+fi
+# ── Ab yahan se Pure Bash environment chal raha hai ──────────────────────────
 # ==============================================================================
 # SETUP CENTER CLI — macOS / Bash Edition
 # ==============================================================================
