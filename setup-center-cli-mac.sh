@@ -937,6 +937,31 @@ menu_network_diagnose() {
     done
 }
 
+# ── STARTUP SCREEN (1: Fix, 2: Check, 3: Main Script) ──────────────────────
+startup_screen() {
+    clear
+    echo -e "${MAGENTA}${BOLD}"
+    echo "  ╔══════════════════════════════════════════════════════╗"
+    echo "  ║     SETUP CENTER CLI  —  macOS / Bash Edition       ║"
+    echo "  ║     Priyanshu Suryavanshi Mac Setup Toolkit         ║"
+    echo "  ╚══════════════════════════════════════════════════════╝"
+    echo -e "${NC}"
+    echo -e "  ${BOLD}${GREEN}[1] Fix Environment & Prerequisites${NC}  (Xcode, Homebrew, PATH)"
+    echo -e "  ${BOLD}${CYAN}[2] Check System Status${NC}               (Installed tools check)"
+    echo -e "  ${BOLD}${MAGENTA}[3] Run Main Setup Script${NC}             (Full Dashboard)"
+    echo -e "  ${BOLD}[0] Exit${NC}"
+    echo -e "\n  ────────────────────────────────────────────────────────"
+    read -rp "  Select option [1/2/3/0]: " start_opt < /dev/tty
+    case "$start_opt" in
+        1) fix_environment ;;
+        2) menu_status ;;
+        0) echo -e "\n  ${CYAN}Goodbye!${NC}\n"; exit 0 ;;
+        *) return ;;
+    esac
+}
+
+startup_screen
+
 # ── MAIN MENU ─────────────────────────────────────────────────────────────────
 while true; do
     clear
