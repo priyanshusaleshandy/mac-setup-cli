@@ -22,12 +22,12 @@
 # Requirements: macOS 12+ (Monterey or newer recommended)
 # ==============================================================================
 
-set -uo pipefail
+set -o pipefail
 
 # ── Self-relaunch (USB pendrive safe copy) ────────────────────────────────────
 SAFE_DIR="$HOME/.local/share/setup-center"
 SAFE_SCRIPT="$SAFE_DIR/setup-center-cli-mac.sh"
-THIS_SCRIPT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+THIS_SCRIPT="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd || echo ".")/$(basename "${BASH_SOURCE[0]:-$0}")"
 if [[ "$THIS_SCRIPT" != "$SAFE_SCRIPT" ]]; then
     mkdir -p "$SAFE_DIR" 2>/dev/null
     if cp -f "$THIS_SCRIPT" "$SAFE_SCRIPT" 2>/dev/null; then
